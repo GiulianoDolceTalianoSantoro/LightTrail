@@ -1,0 +1,3 @@
+# LightTrail
+
+(Game description)
