@@ -7,28 +7,29 @@ public class RoundPlayerController : MonoBehaviour
 {
     private Rigidbody rb;
 
-    //private SlowMotionController slowMotionController;
+    private SlowmotionController slowmotionController;
 
-    public float mass;
     public float maxSpeed;
-    public float clickStrength;
+    public float clickStrength = 500f;
     private Plane plane = new Plane(Vector3.up, Vector3.zero);
-
-    private GameObject dieParticles;
-
-    public static bool isDead;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        //slowMotionController = FindObjectOfType<SlowMotionController>();
-        isDead = false;
+        slowmotionController = FindObjectOfType<SlowmotionController>();
     }
 
     void Update()
     {
-        rb.mass = mass;
         InputManager();
+    }
+
+    void FixedUpdate()
+    {
+        if (rb.velocity.magnitude > maxSpeed)
+        {
+            rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
+        }        
     }
 
     private void InputManager()
@@ -39,7 +40,7 @@ public class RoundPlayerController : MonoBehaviour
             var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             float enter;
 
-            //slowMotionController.DoSlowMotion();
+            slowmotionController.DoSlowMotion();
 
             if (plane.Raycast(ray, out enter))
             {
@@ -49,7 +50,5 @@ public class RoundPlayerController : MonoBehaviour
                 rb.AddForce(mouseDirection * clickStrength, ForceMode.VelocityChange);
             }
         }
-
-        //AudioManager.instance.PlaySound("");
     }
 }
