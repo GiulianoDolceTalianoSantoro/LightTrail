@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class RoundPlayerController : MonoBehaviour
 {
-    private Rigidbody rb;
-
-    private SlowmotionController slowmotionController;
-
-    public float maxSpeed;
-    public float clickStrength = 500f;
+    Rigidbody rb;
+    SlowmotionController slowmotionController;
     private Plane plane = new Plane(Vector3.up, Vector3.zero);
+
+    [Tooltip("The maximum speed the round player can reach.")]
+    public float maxSpeed;
+    [Tooltip("The amount of force that will be applied when you click.")]
+    public float clickStrength = 500f;
 
     void Start()
     {

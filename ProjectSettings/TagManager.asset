@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - RoundPlayer
+  - GameManager
   layers:
   - Default
   - TransparentFX
