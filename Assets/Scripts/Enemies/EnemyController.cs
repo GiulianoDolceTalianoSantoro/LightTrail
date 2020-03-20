@@ -29,7 +29,8 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerPivot = GameObject.FindGameObjectWithTag("RoundPlayer").transform.GetChild(0);
+        playerPivot = GameObject.FindGameObjectWithTag("RoundPlayer").transform.Find("RoundPlayerPivot/RoundPlayerShootAt");
+        Debug.Log(playerPivot);
     }
 
     // Update is called once per frame

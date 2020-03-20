@@ -14,6 +14,9 @@ public class RoundPlayerController : MonoBehaviour
     [Tooltip("The amount of force that will be applied when you click.")]
     public float clickStrength = 500f;
 
+
+    public Vector3 movementDirection;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,6 +26,7 @@ public class RoundPlayerController : MonoBehaviour
     void Update()
     {
         InputManager();
+        LookAtMousePosition();
     }
 
     void FixedUpdate()
@@ -51,5 +55,15 @@ public class RoundPlayerController : MonoBehaviour
                 rb.AddForce(mouseDirection * clickStrength, ForceMode.VelocityChange);
             }
         }
+    }
+
+    private void LookAtMousePosition()
+    {
+        Transform roundPlayerShootAt = transform.GetChild(0);
+
+        Vector3 v3T = Input.mousePosition;
+        v3T.z = Mathf.Abs(Camera.main.transform.position.y - roundPlayerShootAt.position.y);
+        v3T = Camera.main.ScreenToWorldPoint(v3T);
+        roundPlayerShootAt.LookAt(v3T);
     }
 }
