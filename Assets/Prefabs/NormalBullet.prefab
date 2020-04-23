@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 80d6363ae1ad6234abd47f96c4b2bb66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 50
+  speed: 35
 --- !u!54 &4133359006623879776
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -11731,7 +11731,7 @@ TrailRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 442c13835cce30e419a4d5e5a06fac94, type: 2}
+  - {fileID: 2100000, guid: bc7f027993cafce4e8fe8d4ad530c5b3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
