@@ -10,15 +10,22 @@ public class RoundPlayerController : MonoBehaviour
     SlowmotionController slowmotionController;
     private Plane plane = new Plane(Vector3.up, Vector3.zero);
     private Material roundPlayerMat;
+    private Material roundPlayerTrailMat;
 
     [Tooltip("The maximum speed the round player can reach.")]
     public float maxSpeed;
     [Tooltip("The amount of force that will be applied when you click.")]
     public float clickStrength = 500f;
 
-    private string currentColorMat;
+    private string currentCracksColorMat;
+    private string currentTrailColorMat;
+    private string currentEdgeColorMat;
+
     private List<Color> colorsToChange;
     private Queue<Color> colorToChangeStack;
+
+    private GameObject[] wallGrids;
+    private string currentWallGridsColorMat;
 
     void Start()
     {
@@ -26,13 +33,16 @@ public class RoundPlayerController : MonoBehaviour
         slowmotionController = FindObjectOfType<SlowmotionController>();
 
         roundPlayerMat = GetComponent<MeshRenderer>().material;
-        currentColorMat = roundPlayerMat.shader.GetPropertyName(1);
+        roundPlayerTrailMat = GetComponent<TrailRenderer>().material;
+
+        currentCracksColorMat = roundPlayerMat.shader.GetPropertyName(1);
+        currentEdgeColorMat = roundPlayerMat.shader.GetPropertyName(2);
+        currentTrailColorMat = roundPlayerTrailMat.shader.GetPropertyName(0);
 
         colorsToChange = new List<Color>();
-        colorsToChange.Add(roundPlayerMat.GetColor("Color_CC753CAF"));
 
-        //colorsToChange.Add(roundPlayerMat.GetColor("Color_89B95357"));
-        //colorsToChange.Add(roundPlayerMat.GetColor("Color_5CFF9DBB"));
+        colorsToChange.Add(roundPlayerMat.GetColor("Color_D532411"));
+        colorsToChange.Add(roundPlayerMat.GetColor("Color_1E16DB93"));
 
         colorToChangeStack = new Queue<Color>();
 
@@ -40,17 +50,15 @@ public class RoundPlayerController : MonoBehaviour
         {
             colorToChangeStack.Enqueue(colorsToChange[i]);
         }
+
+        wallGrids = GameObject.FindGameObjectsWithTag("WallGrid");
+        currentWallGridsColorMat = wallGrids[0].GetComponent<MeshRenderer>().material.shader.GetPropertyName(0);
     }
 
     void Update()
     {
         InputManager();
         LookAtMousePosition();
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            AnimateMaterial();
-        }
     }
 
     void FixedUpdate()
@@ -106,7 +114,13 @@ public class RoundPlayerController : MonoBehaviour
             Color colorToChange = colorToChangeStack.Dequeue();
 
             Sequence s = DOTween.Sequence();
-            s.Append(roundPlayerMat.DOColor(colorToChange, currentColorMat, .25f));
+            s.Append(roundPlayerMat.DOColor(colorToChange, currentCracksColorMat, .25f));
+            s.Join(roundPlayerMat.DOColor(colorToChange, currentEdgeColorMat, .25f));
+            s.Join(roundPlayerTrailMat.DOColor(colorToChange, currentTrailColorMat, .25f));
+            for (int i = 0; i < wallGrids.Length; i++)
+            {
+                s.Join(wallGrids[i].GetComponent<MeshRenderer>().material.DOColor(colorToChange, currentWallGridsColorMat, .25f));
+            }
         }
     }
 }
