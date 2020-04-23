@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: RoundPlayer_Mat
-  m_Shader: {fileID: -6465566751694194690, guid: 1bf58f40fc1204c4eb32744156ab26cf,
+  m_Shader: {fileID: -6465566751694194690, guid: fb8d86f46ca461e4da82dc8da6d7e37c,
     type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
@@ -19,12 +19,20 @@ Material:
   disabledShaderPasses: []
   m_SavedProperties:
     serializedVersion: 3
-    m_TexEnvs: []
-    m_Floats: []
+    m_TexEnvs:
+    - _SampleTexture2D_644B4152_Texture_1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - Vector1_2540EA68: 0
+    - Vector1_5CD6FF7B: 1
+    - Vector1_6359E30C: 15.31
+    - Vector1_7A98DB5: 0.3
+    - Vector1_F95D2A03: 0
     m_Colors:
-    - Color_10C6BCFB: {r: 0, g: 3.501113, b: 3.526365, a: 0}
-    - Color_1F69B425: {r: 0, g: 15.74902, b: 16, a: 0}
-    - Color_5CFF9DBB: {r: 8, g: 0, b: 0, a: 0}
-    - Color_89B95357: {r: 5.117763, g: 0, b: 7.999999, a: 0}
-    - RoundPlayer_Color: {r: 0, g: 15.74902, b: 16, a: 0}
-    - _Color: {r: 0, g: 15.74902, b: 16, a: 0}
+    - Color_1E16DB93: {r: 5.992157, g: 0, b: 0, a: 0}
+    - Color_49A4FA37: {r: 0, g: 0.4764706, b: 0.5, a: 0}
+    - Color_8B4C6E19: {r: 0, g: 0, b: 0, a: 0}
+    - Color_C2F2B08E: {r: 0, g: 0, b: 0, a: 0}
+    - Color_D532411: {r: 5.992157, g: 5.7411766, b: 0, a: 0}
