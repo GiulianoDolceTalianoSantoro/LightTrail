@@ -35,7 +35,10 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        EnemyMovement();
+        if (!RoundPlayerController.goalReached)
+        {
+            EnemyMovement();
+        }
     }
 
     void EnemyMovement()

@@ -28,6 +28,8 @@ public class GoalController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("RoundPlayer"))
         {
+            RoundPlayerController.goalReached = true;
+
             GetDestroyed();
         }
     }

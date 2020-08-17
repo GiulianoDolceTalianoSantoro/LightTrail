@@ -27,8 +27,14 @@ public class RoundPlayerController : MonoBehaviour
     private GameObject[] wallGrids;
     private string currentWallGridsColorMat;
 
+    public static bool goalReached;
+
+    private GameManager gameManager;
+
     void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
+
         rb = GetComponent<Rigidbody>();
         slowmotionController = FindObjectOfType<SlowmotionController>();
 
@@ -53,12 +59,17 @@ public class RoundPlayerController : MonoBehaviour
 
         wallGrids = GameObject.FindGameObjectsWithTag("WallGrid");
         currentWallGridsColorMat = wallGrids[0].GetComponent<MeshRenderer>().material.shader.GetPropertyName(0);
+
+        goalReached = false;
     }
 
     void Update()
     {
-        InputManager();
-        LookAtMousePosition();
+        if (!goalReached)
+        {
+            InputManager();
+            LookAtMousePosition();
+        }
     }
 
     void FixedUpdate()
@@ -72,14 +83,14 @@ public class RoundPlayerController : MonoBehaviour
     private void InputManager()
     {
         bool canMove = Input.GetMouseButton(0);
+
         if (canMove)
         {
-            var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            float enter;
+            var ray = gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
 
             slowmotionController.DoSlowMotion();
 
-            if (plane.Raycast(ray, out enter))
+            if (plane.Raycast(ray, out float enter))
             {
                 var hitPoint = ray.GetPoint(enter);
                 var mouseDirection = hitPoint - gameObject.transform.position;
@@ -94,8 +105,8 @@ public class RoundPlayerController : MonoBehaviour
         Transform roundPlayerShootAt = transform.GetChild(0);
 
         Vector3 v3T = Input.mousePosition;
-        v3T.z = Mathf.Abs(Camera.main.transform.position.y - roundPlayerShootAt.position.y);
-        v3T = Camera.main.ScreenToWorldPoint(v3T);
+        v3T.z = Mathf.Abs(gameManager.mainCamera.transform.position.y - roundPlayerShootAt.position.y);
+        v3T = gameManager.mainCamera.ScreenToWorldPoint(v3T);
         roundPlayerShootAt.LookAt(v3T);
     }
 
@@ -117,6 +128,7 @@ public class RoundPlayerController : MonoBehaviour
             s.Append(roundPlayerMat.DOColor(colorToChange, currentCracksColorMat, .25f));
             s.Join(roundPlayerMat.DOColor(colorToChange, currentEdgeColorMat, .25f));
             s.Join(roundPlayerTrailMat.DOColor(colorToChange, currentTrailColorMat, .25f));
+
             for (int i = 0; i < wallGrids.Length; i++)
             {
                 s.Join(wallGrids[i].GetComponent<MeshRenderer>().material.DOColor(colorToChange, currentWallGridsColorMat, .25f));
