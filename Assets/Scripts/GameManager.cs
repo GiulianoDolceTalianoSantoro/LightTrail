@@ -5,48 +5,149 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
-    public Camera mainCamera;
-    public Camera goalCamera;
+    [HideInInspector]
+    public int screenWidth = Screen.width;
+    [HideInInspector]
+    public int screenHeight = Screen.height;
 
-    private int cameraIndex;
+    static public GameManager instance { get { return Instance; } }
+    static protected GameManager Instance;
 
-    bool levelCompleted;
+    [HideInInspector]
+    public int indexLevelToLoad;
+    [HideInInspector]
+    public bool levelCompleted;
+    [HideInInspector]
+    public Transform currentLevel;
+    [HideInInspector]
+    public bool gameIsPaused;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        cameraIndex = 0;
+    public RoundPlayerController player;
 
-        mainCamera.enabled = true;
-        mainCamera.GetComponent<AudioListener>().enabled = true;
+    public Camera loadoutCamera;
+    public Camera gameCamera;
+    public Camera gameOverCamera;
+    
+    public SlowmotionController slowmotionController;
 
-        goalCamera.enabled = false;
-        goalCamera.GetComponent<AudioListener>().enabled = false;
+    public AState[] states;
+    public AState topState { 
+        get { 
+            if (stateStack.Count == 0) 
+                return null; 
+            return stateStack[stateStack.Count - 1]; 
+        } 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        IsLevelComplete();
-    }
+    protected List<AState> stateStack = new List<AState>();
+    protected Dictionary<string, AState> stateDict = new Dictionary<string, AState>();
 
-    void IsLevelComplete()
+    protected void OnEnable()
     {
-        if (RoundPlayerController.goalReached && cameraIndex == 0)
+        Instance = this;
+
+        if (screenWidth == Screen.width || screenHeight == Screen.height)
         {
-            mainCamera.enabled = false;
-            mainCamera.GetComponent<AudioListener>().enabled = false;
+            screenHeight = Screen.width - (640 * 2);
+            screenWidth = Screen.height - (360 * 2);
+            Screen.SetResolution(screenWidth, screenHeight, true);
+        }
 
-            goalCamera.enabled = true;
-            goalCamera.GetComponent<AudioListener>().enabled = true;
+        // We build a dictionnary from state for easy switching using their name.
+        stateDict.Clear();
 
-            cameraIndex = 1;
-            levelCompleted = true;
+        if (states.Length == 0)
+            return;
+
+        for (int i = 0; i < states.Length; ++i)
+        {
+            states[i].manager = this;
+            stateDict.Add(states[i].GetName(), states[i]);
+        }
+
+        stateStack.Clear();
+
+        PushState(states[0].GetName());
+    }
+
+    protected void Update()
+    {
+        if (stateStack.Count > 0)
+        {
+            stateStack[stateStack.Count - 1].Tick();
         }
     }
 
-    void ChangeScene(int sceneIndex)
+    // State management
+    public void SwitchState(string newState)
     {
-        SceneManager.LoadScene(sceneIndex);
+        AState state = FindState(newState);
+        if (state == null)
+        {
+            Debug.LogError("Can't find the state named " + newState);
+            return;
+        }
+
+        stateStack[stateStack.Count - 1].Exit(state);
+        state.Enter(stateStack[stateStack.Count - 1]);
+        stateStack.RemoveAt(stateStack.Count - 1);
+        stateStack.Add(state);
     }
+
+    public AState FindState(string stateName)
+    {
+        AState state;
+        if (!stateDict.TryGetValue(stateName, out state))
+        {
+            return null;
+        }
+
+        return state;
+    }
+
+    public void PopState()
+    {
+        if (stateStack.Count < 2)
+        {
+            Debug.LogError("Can't pop states, only one in stack.");
+            return;
+        }
+
+        stateStack[stateStack.Count - 1].Exit(stateStack[stateStack.Count - 2]);
+        stateStack[stateStack.Count - 2].Enter(stateStack[stateStack.Count - 2]);
+        stateStack.RemoveAt(stateStack.Count - 1);
+    }
+
+    public void PushState(string name)
+    {
+        AState state;
+        if (!stateDict.TryGetValue(name, out state))
+        {
+            Debug.LogError("Can't find the state named " + name);
+            return;
+        }
+
+        if (stateStack.Count > 0)
+        {
+            stateStack[stateStack.Count - 1].Exit(state);
+            state.Enter(stateStack[stateStack.Count - 1]);
+        }
+        else
+        {
+            state.Enter(null);
+        }
+        stateStack.Add(state);
+    }
+}
+
+public abstract class AState : MonoBehaviour
+{
+    [HideInInspector]
+    public GameManager manager;
+
+    public abstract void Enter(AState from);
+    public abstract void Exit(AState to);
+    public abstract void Tick();
+
+    public abstract string GetName();
 }

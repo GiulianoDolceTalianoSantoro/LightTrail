@@ -29,14 +29,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2382743080319331745}
-  m_LocalRotation: {x: -0.0006531489, y: -0.00074285775, z: -0.0017544872, w: 0.99999803}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_Children:
   - {fileID: 8034559766239722254}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: -0.075, y: -0.085, z: -0.201}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &2382743080319331756
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -125,8 +125,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 169056d3700f0d34fad7ee03d674392d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 50
-  clickStrength: 50
+  rb: {fileID: 2382743080319331759}
+  maxSpeed: 40
+  clickStrength: 10
+  goalReached: 0
+  currentLife: 0
+  isRetry: 0
 --- !u!96 &848423622
 TrailRenderer:
   serializedVersion: 2
@@ -176,7 +180,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.58267725
+        value: 0.4541067
         inSlope: -1.3084569
         outSlope: -1.3084569
         tangentMode: 0

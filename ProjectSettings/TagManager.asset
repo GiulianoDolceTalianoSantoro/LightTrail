@@ -9,6 +9,10 @@ TagManager:
   - Bullet
   - WallGrid
   - WinningGround
+  - Level_1
+  - GameCamera
+  - LevelHolder
+  - Level_2
   layers:
   - Default
   - TransparentFX

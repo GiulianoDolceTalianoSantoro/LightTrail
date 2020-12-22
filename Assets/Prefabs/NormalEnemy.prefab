@@ -4969,9 +4969,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   minDist: 30
-  maxDist: 60
+  maxDist: 50
   bulletPrefab: {fileID: 746712602921878522, guid: 6d682f8e3f8375f42bb8e2917d9e8111,
     type: 3}
   firePart: {fileID: 1776554366}
-  fireDist: 30
-  fireRate: 0.35
+  fireDist: 25
+  fireRate: 0.4

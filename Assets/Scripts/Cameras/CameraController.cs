@@ -1,34 +1,35 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using DG.Tweening;
 
 public class CameraController : MonoBehaviour
 {
-    public GameObject target;
+    public static Camera gameCamera;
     private Vector3 offset;
+    [HideInInspector]
+    public GameObject target;
 
     public float zoomFOV = 10f;
     float normalFOV;
     public Ease ease;
 
-    public GameManager gameManager;
-
     // Start is called before the first frame update
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        gameCamera = this.GetComponent<Camera>();
 
-        normalFOV = gameManager.mainCamera.fieldOfView;
-        offset = transform.position - target.transform.position;
+        target = GameObject.FindGameObjectWithTag("RoundPlayer");
+
+        normalFOV = gameCamera.fieldOfView;
+        transform.parent.position = new Vector3(target.transform.position.x, target.transform.position.y + 50f, 0f);
+        offset = transform.parent.position - target.transform.position;
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (gameManager.mainCamera != null)
+        if (gameCamera != null && !GameManager.instance.gameIsPaused)
         {
-            transform.position = target.transform.position + offset;
+            transform.parent.position = target.transform.localPosition + offset;
             DoZoom();
         }
     }
@@ -37,7 +38,7 @@ public class CameraController : MonoBehaviour
     {
         float fov = state ? zoomFOV : normalFOV;
 
-        DOVirtual.Float(gameManager.mainCamera.fieldOfView, fov, .1f, FieldOfView).SetEase(ease);
+        DOVirtual.Float(gameCamera.fieldOfView, fov, .1f, FieldOfView).SetEase(ease);
     }
 
     void DoZoom()
@@ -55,6 +56,6 @@ public class CameraController : MonoBehaviour
 
     void FieldOfView(float fov)
     {
-        gameManager.mainCamera.fieldOfView = fov;
+        gameCamera.fieldOfView = fov;
     }
 }

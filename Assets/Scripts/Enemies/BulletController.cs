@@ -16,34 +16,59 @@ public class BulletController : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         rb.AddForce(transform.forward * speed, ForceMode.Impulse);
-        StartCoroutine(GetDestroy());
+        StartCoroutine(GetDestroy(2));
+    }
+
+    private void Update()
+    {
+        if (GameManager.instance.gameIsPaused)
+        {
+            OnPause();
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("RoundPlayer"))
         {
-            // Shake camera
             Destroy(gameObject);
         }
     }
 
-    IEnumerator GetDestroy()
+    [HideInInspector]
+    public Vector3 bulletVelocityUntilPause;
+    public void OnPause()
+    {
+        Time.timeScale = 0f;
+        bulletVelocityUntilPause = rb.velocity;
+        rb.velocity = Vector3.zero;
+    }
+
+    public void OnResume()
+    {
+        Time.timeScale = 1f;
+        rb.velocity = bulletVelocityUntilPause;
+    }
+
+    IEnumerator GetDestroy(float time)
     {
         if (gameObject != null)
         {
             float trailStart = gameObject.transform.GetChild(0).GetComponent<TrailRenderer>().startWidth;
-            float _zero = 0f;
 
-            Sequence s = DOTween.Sequence();
+            Vector3 originalScale = transform.localScale;
+            Vector3 destinationScale = Vector3.zero;
 
-            yield return new WaitForSeconds(2f);
+            float currentTime = 0.0f;
 
-            s.Append(gameObject.transform.DOScale(0f, 1f));
-            DOVirtual.Float(trailStart, _zero, 1f, (zero) => gameObject.transform.GetChild(0).GetComponent<TrailRenderer>().startWidth = zero);
+            do
+            {
+                transform.localScale = Vector3.Lerp(originalScale, destinationScale, currentTime / time);
+                gameObject.transform.GetChild(0).GetComponent<TrailRenderer>().startWidth = Mathf.Lerp(trailStart, 0f, currentTime / time);
+                currentTime += Time.deltaTime;
+                yield return null;
+            } while (currentTime <= time);
 
-            // WaitForSeconds runs out of time with respect to the DOTween sequence, so we must take it into account to indicate how many seconds to wait.
-            yield return new WaitForSeconds(1.5f);
             Destroy(gameObject);
         }
     }

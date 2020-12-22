@@ -1,14 +1,13 @@
 ﻿using DG.Tweening;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RoundPlayerController : MonoBehaviour
 {
-    Rigidbody rb;
+    public Rigidbody rb;
+
     SlowmotionController slowmotionController;
-    private Plane plane = new Plane(Vector3.up, Vector3.zero);
     private Material roundPlayerMat;
     private Material roundPlayerTrailMat;
 
@@ -27,15 +26,20 @@ public class RoundPlayerController : MonoBehaviour
     private GameObject[] wallGrids;
     private string currentWallGridsColorMat;
 
-    public static bool goalReached;
+    public bool goalReached;
+    public int currentLife;
+    public bool isRetry;
 
-    private GameManager gameManager;
+    private Plane plane = new Plane(Vector3.up, Vector3.zero);
+
+    // Temp
+    [HideInInspector]
+    public string time;
 
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
+        InitPlayer();
 
-        rb = GetComponent<Rigidbody>();
         slowmotionController = FindObjectOfType<SlowmotionController>();
 
         roundPlayerMat = GetComponent<MeshRenderer>().material;
@@ -59,17 +63,6 @@ public class RoundPlayerController : MonoBehaviour
 
         wallGrids = GameObject.FindGameObjectsWithTag("WallGrid");
         currentWallGridsColorMat = wallGrids[0].GetComponent<MeshRenderer>().material.shader.GetPropertyName(0);
-
-        goalReached = false;
-    }
-
-    void Update()
-    {
-        if (!goalReached)
-        {
-            InputManager();
-            LookAtMousePosition();
-        }
     }
 
     void FixedUpdate()
@@ -77,7 +70,20 @@ public class RoundPlayerController : MonoBehaviour
         if (rb.velocity.magnitude > maxSpeed)
         {
             rb.velocity = Vector3.ClampMagnitude(rb.velocity, maxSpeed);
-        }        
+        }
+        
+        if (!goalReached && !GameManager.instance.gameIsPaused)
+        {
+            InputManager();
+            LookAtMousePosition();
+        }
+    }
+
+    void InitPlayer()
+    {
+        transform.localPosition = new Vector3(0, 1f, 0f);
+        transform.localScale = new Vector3(2f, 2f, 2f);
+        rb.velocity = Vector3.zero;
     }
 
     private void InputManager()
@@ -86,9 +92,10 @@ public class RoundPlayerController : MonoBehaviour
 
         if (canMove)
         {
-            var ray = gameManager.mainCamera.ScreenPointToRay(Input.mousePosition);
+            var ray = GameManager.instance.gameCamera.ScreenPointToRay(Input.mousePosition);
 
-            slowmotionController.DoSlowMotion();
+            slowmotionController.slowdownLength = .5f;
+            slowmotionController.DoSlowMotion(0.02f);
 
             if (plane.Raycast(ray, out float enter))
             {
@@ -102,11 +109,13 @@ public class RoundPlayerController : MonoBehaviour
 
     private void LookAtMousePosition()
     {
+        
+
         Transform roundPlayerShootAt = transform.GetChild(0);
 
         Vector3 v3T = Input.mousePosition;
-        v3T.z = Mathf.Abs(gameManager.mainCamera.transform.position.y - roundPlayerShootAt.position.y);
-        v3T = gameManager.mainCamera.ScreenToWorldPoint(v3T);
+        v3T.z = Mathf.Abs(GameManager.instance.gameCamera.transform.position.y - roundPlayerShootAt.position.y);
+        v3T = GameManager.instance.gameCamera.ScreenToWorldPoint(v3T);
         roundPlayerShootAt.LookAt(v3T);
     }
 
@@ -115,6 +124,7 @@ public class RoundPlayerController : MonoBehaviour
         if (collision.gameObject.CompareTag("Bullet"))
         {
             AnimateMaterial();
+            currentLife--;
         }
     }
 

@@ -7,35 +7,34 @@ public class GoalController : MonoBehaviour
     public GameObject fracturedGoal;
     public Material mat;
 
-    private GameObject winningGround;
+    RoundPlayerController player;
+
+    public GameObject winningGroundPrefab;
 
     SlowmotionController slowmotionController;
 
     // Start is called before the first frame update
     void Start()
     {
-        winningGround = GameObject.FindGameObjectWithTag("WinningGround");
+        player = FindObjectOfType<RoundPlayerController>();
+
         slowmotionController = FindObjectOfType<SlowmotionController>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("RoundPlayer"))
         {
-            RoundPlayerController.goalReached = true;
+            player.goalReached = true;
 
-            GetDestroyed();
+            StartCoroutine(GetDestroyed());
         }
     }
 
-    void GetDestroyed()
+    IEnumerator GetDestroyed()
     {
+        GameObject winningGround = Instantiate(winningGroundPrefab, new Vector3(player.transform.position.x, 0f, player.transform.position.z + 200f), Quaternion.identity);
+
         GameObject fracturedGoalObj = Instantiate(fracturedGoal,
             new Vector3(transform.position.x, transform.position.y - 50f, transform.position.z), Quaternion.identity) as GameObject;
         fracturedGoalObj.transform.localScale = new Vector3(1.993f, 3.700222f, 4.951498f);
@@ -77,5 +76,8 @@ public class GoalController : MonoBehaviour
 
         slowmotionController.slowdownLength = 10f;
         slowmotionController.DoSlowMotion(0.05f);
+
+        yield return new WaitForSeconds(2f);
+        Destroy(fracturedGoal.gameObject);
     }
 }

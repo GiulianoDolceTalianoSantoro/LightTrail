@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class SlowmotionController : MonoBehaviour
 {
-    public const float slowdownFactor = 0.1f;
-
-    public float slowdownLength = 0.8f;
+    public const float slowdownFactor = 0.5f;
+    public float slowdownLength;
 
     // Update is called once per frame
     void Update()

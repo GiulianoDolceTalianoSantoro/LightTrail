@@ -6,6 +6,7 @@ public class EnemyController : MonoBehaviour
 {
     Rigidbody rb;
     Transform playerPivot;
+    RoundPlayerController player;
 
     [Header("Movement")]
     [Tooltip("The speed of movement.")]
@@ -29,13 +30,14 @@ public class EnemyController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        playerPivot = GameObject.FindGameObjectWithTag("RoundPlayer").transform.Find("RoundPlayerPivot/RoundPlayerShootAt");
+        player = FindObjectOfType<RoundPlayerController>();
+        playerPivot = player.transform.Find("RoundPlayerPivot/RoundPlayerShootAt");
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!RoundPlayerController.goalReached)
+        if (!player.goalReached && !GameManager.instance.gameIsPaused)
         {
             EnemyMovement();
         }
@@ -55,7 +57,9 @@ public class EnemyController : MonoBehaviour
             rb.velocity = Vector3.zero;
         }
 
-        if(Vector3.Distance(transform.position, playerPivot.position) <= fireDist)
+        var s = Vector3.Distance(transform.position, player.transform.position);
+
+        if (s <= fireDist)
         {
             Fire();
         }
